@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MusicBox — Explorar</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="../css/explorar.css"/>
+</head>
+<body class="app-body">
+
+  <nav class="navbar-custom">
+    <a href="../app.html" class="nav-logo">◉ Vinyl</a>
+    <div class="nav-links">
+
+      <a href="explorar.html"  class="nav-item active" style="color:var(--btn)">🔥 Explorar</a>
+      <a href="busca.html"     class="nav-item">🔍 Buscar</a>
+ <a href="reviews.html"class="nav-item">💬 Reviews</a>
+      <a href="perfil.html"    class="nav-item">👤 Perfil</a>
+      <a href="javascript:logout()" class="nav-item">🚪 Sair</a>
+    </div>
+  </nav>
+
+  <main class="app-main">
+    <div class="section-header">
+      <h2>🔥 Explorar</h2>
+      <p>Descubra e avalie músicas.</p>
+    </div>
+
+    <!-- Gêneros -->
+ <h3 class="section-title">Gêneros</h3>
+<div class="generos-grid mb-5">
+  <button class="genero-card" onclick="filtrarPorGenero('Pop')" style="background: linear-gradient(45deg, #b1735da3, #b1735da3);">Pop</button>
+  <button class="genero-card" onclick="filtrarPorGenero('R&B')" style="background: linear-gradient(45deg, #4c008296, #4c008296);">R&B</button>
+  <button class="genero-card" onclick="filtrarPorGenero('Pagode')" style="background: linear-gradient(45deg, #f39d128a, #f39d128a);">Pagode</button>
+  <button class="genero-card" onclick="filtrarPorGenero('Metal')" style="background: linear-gradient(45deg, #68575737 , #68575737);">Metal</button>
+  <button class="genero-card" onclick="filtrarPorGenero('MPB')" style="background: linear-gradient(45deg, #1e844989, #1e844989);">MPB</button>
+  <button class="genero-card" onclick="filtrarPorGenero('Korean')" style="background: linear-gradient(45deg, #b112428e, #b112428e);">K-Pop</button>
+  <button class="genero-card" onclick="filtrarPorGenero('Rock')" style="background: linear-gradient(45deg, #297fb98e, #297fb98e);">Rock</button>
+  <button class="genero-card" onclick="filtrarPorGenero('Brasileiro')" style="background: linear-gradient(45deg, #d3540089, #d3540089);">Pop Brasileiro</button>
+</div>
+
+  <div id="resultado-explorar" class="row"></div>
+      </div>
+      
+  </main>
+
+<script src="../js/utils.js"></script>
+<script src="../js/explorar.js"></script>
+</body>
+</html>
