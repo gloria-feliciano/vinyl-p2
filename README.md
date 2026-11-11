@@ -1,20 +1,69 @@
 # Vinyl
 
-Frontend estático do projeto Vinyl, feito com HTML, CSS e JavaScript.
+Projeto Vinyl: plataforma musical com frontend em HTML, CSS e JavaScript e backend desenvolvido em TypeScript.
 
-## Executar
+## Tecnologias
 
-Sirva a pasta `frontend` com qualquer servidor HTTP estático. Por exemplo, com Python:
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
+- Bootstrap
 
-```powershell
-python -m http.server 3000 --directory frontend
+### Backend
+- Node.js
+- TypeScript
+- Express
+- Sequelize
+- PostgreSQL
+- Docker e Docker Compose
+
+## Estrutura do projeto
+
+```text
+vinyl-p2/
+├── frontend/
+│   ├── páginas, estilos e scripts
+│   └── ...
+├── api/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── docs/
+│   │   ├── middlewares/
+│   │   ├── models/
+│   │   └── routes/
+│   ├── .env.example
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   ├── package.json
+│   └── README.md
+└── README.md
 ```
 
-Abra `http://localhost:3000` no navegador. Não é necessário instalar dependências npm.
+## Executar o projeto
 
-O Bootstrap é carregado por CDN, então a conexão com a internet é necessária para os estilos correspondentes. A API ainda não foi implementada; autenticação, catálogo, reviews e playlists dependem dela.
+### Frontend
 
-## Estrutura
+É possível executar o frontend com um servidor HTTP estático. Utilizando Python:
 
-- `frontend/`: páginas, estilos e scripts do frontend existente.
-- `api/`: estrutura inicial reservada para a futura API; nenhuma tecnologia de backend foi definida.
+```bash
+python -m http.server 5500 --directory frontend
+```
+
+Acesse: http://localhost:5500
+
+### Backend e banco de dados
+
+Consulte as instruções de instalação e execução em [`api/README.md`](api/README.md).
+
+A API utiliza Docker Compose para executar o servidor e o PostgreSQL.
+
+## Documentação
+
+A documentação da API e as instruções para configurar o ambiente estão disponíveis em `api/README.md`.
+
+## Desenvolvimento
+
+O projeto utiliza branches de funcionalidades (`feature/*`) e Pull Requests para integrar alterações à branch `dev`. A branch `main` é reservada para versões estáveis.
+
