@@ -1,23 +1,35 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../config/database";
 
+/*
+ * ─────────────────────────────────────────────────────────────
+ * INTERFACES DE TIPAGEM
+ * ─────────────────────────────────────────────────────────────
+ */
 interface AlbumAttributes {
     id: number;
     title: string;
     releaseYear: number | null;
     genre: string | null;
     coverUrl: string | null;
-    artistId: number;
+    artistId: number;          // chave estrangeira: aponta para Artist.id
     createdAt?: Date;
     updatedAt?: Date;
 }
 
+// No create, só title e artistId são obrigatórios.
+// id, releaseYear, genre e coverUrl são opcionais.
 interface AlbumCreationAttributes
     extends Optional<
         AlbumAttributes,
         "id" | "releaseYear" | "genre" | "coverUrl"
     > {}
 
+/*
+ * ─────────────────────────────────────────────────────────────
+ * CLASSE ALBUM
+ * ─────────────────────────────────────────────────────────────
+ */
 class Album
     extends Model<AlbumAttributes, AlbumCreationAttributes>
     implements AlbumAttributes {
@@ -27,18 +39,25 @@ class Album
     public genre!: string | null;
     public coverUrl!: string | null;
     public artistId!: number;
-
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 }
 
+/*
+ * ─────────────────────────────────────────────────────────────
+ * DEFINIÇÃO DAS COLUNAS
+ * ─────────────────────────────────────────────────────────────
+ */
 Album.init(
     {
+        // id automático
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
         },
+
+        // title: obrigatório, até 200 caracteres
         title: {
             type: DataTypes.STRING(200),
             allowNull: false,
@@ -50,6 +69,8 @@ Album.init(
                 },
             },
         },
+
+        // releaseYear: ano de lançamento, entre 1900 e 2100
         releaseYear: {
             type: DataTypes.INTEGER,
             allowNull: true,
@@ -58,10 +79,14 @@ Album.init(
                 max: { args: [2100], msg: "Ano inválido (máximo 2100)." },
             },
         },
+
+        // genre: opcional
         genre: {
             type: DataTypes.STRING(60),
             allowNull: true,
         },
+
+        // coverUrl: link da capa, opcional mas válido se enviado
         coverUrl: {
             type: DataTypes.STRING(500),
             allowNull: true,
@@ -69,6 +94,9 @@ Album.init(
                 isUrl: { msg: "coverUrl deve ser uma URL válida." },
             },
         },
+
+        // artistId: OBRIGATÓRIO e aponta para artists.id
+        // references garante a chave estrangeira no banco
         artistId: {
             type: DataTypes.INTEGER,
             allowNull: false,
@@ -82,6 +110,7 @@ Album.init(
         sequelize,
         tableName: "albums",
         timestamps: true,
+        // índices aceleram buscas e filtros por artista e título
         indexes: [{ fields: ["artistId"] }, { fields: ["title"] }],
     }
 );

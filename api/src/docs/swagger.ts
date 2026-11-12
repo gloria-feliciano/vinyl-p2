@@ -1,9 +1,33 @@
 import swaggerJsdoc from "swagger-jsdoc";
 import { Options } from "swagger-jsdoc";
 
+/*
+ * ─────────────────────────────────────────────────────────────
+ * CONFIGURAÇÃO DO SWAGGER (documentação interativa da API)
+ * ─────────────────────────────────────────────────────────────
+ * Este arquivo NÃO contém lógica da API. Ele monta um "mapa" que
+ * descreve todos os endpoints para o Swagger UI renderizar a
+ * página visual em /api-docs.
+ *
+ * O objeto "options" tem duas partes:
+ * 1. definition  -> a especificação OpenAPI (títulos, schemas, rotas)
+ * 2. apis        -> de onde ler anotações JSDoc (aqui: nenhum)
+ *
+ * Tudo é declarado "inline" (dentro deste arquivo), então não
+ * dependemos de comentários espalhados nos controllers.
+ * ─────────────────────────────────────────────────────────────
+ */
 const options: Options = {
     definition: {
+        /*
+         * Versão do padrão OpenAPI usada.
+         * 3.0.3 é o formato aceito pelo Swagger UI 5.x.
+         */
         openapi: "3.0.3",
+
+        /*
+         * INFORMAÇÕES GERAIS que aparecem no topo da página /api-docs.
+         */
         info: {
             title: "Vinyl API — Catálogo Musical",
             version: "1.0.0",
@@ -11,18 +35,52 @@ const options: Options = {
                 "API do projeto Vinyl. Módulo de Catálogo Musical (Integrante 2): " +
                 "Artistas, Álbuns, Músicas e Busca global.",
         },
+
+        /*
+         * SERVIDORES onde a API está rodando.
+         * O Swagger UI mostra um dropdown para o usuário escolher
+         * contra qual servidor enviar as requisições de teste.
+         *
+         * - O primeiro usa /api como prefixo (ex: /api/artists).
+         * - O segundo aponta para a raiz (usado só como referência).
+         */
         servers: [
             { url: "http://localhost:3000/api", description: "Local" },
             { url: "http://localhost:3000", description: "Local (raiz)" },
         ],
+
+        /*
+         * TAGS: agrupam os endpoints por tema na interface.
+         * Cada rota declara sua tag no "tags: [...]" para aparecer
+         * dentro do grupo correto.
+         */
         tags: [
             { name: "Artists", description: "Gestão de artistas" },
             { name: "Albums", description: "Gestão de álbuns" },
             { name: "Songs", description: "Gestão de músicas" },
             { name: "Search", description: "Busca global" },
         ],
+
+        /*
+         * ─────────────────────────────────────────────────────
+         * COMPONENTES: schemas reutilizáveis
+         * ─────────────────────────────────────────────────────
+         * Aqui definimos a "forma" dos objetos que a API devolve
+         * e recebe. Depois, em qualquer rota, basta referenciar com
+         * $ref: "#/components/schemas/NomeDoSchema".
+         *
+         * Separamos dois tipos por entidade:
+         * - "Artist"/"Album"/"Song"      -> saída (resposta do GET)
+         * - "ArtistInput"/"AlbumInput"/"SongInput" -> entrada (body do POST/PUT)
+         */
         components: {
             schemas: {
+                /*
+                 * SCHEMA ARTIST (resposta)
+                 * Representa como o artista é devolvido pela API.
+                 * Serve como "moldura" na documentação — exemplos
+                 * mostram preenchimento para o professor entender.
+                 */
                 Artist: {
                     type: "object",
                     properties: {
@@ -39,6 +97,13 @@ const options: Options = {
                         updatedAt: { type: "string", format: "date-time" },
                     },
                 },
+
+                /*
+                 * SCHEMA ARTISTINPUT (requisição)
+                 * Só o "name" é obrigatório — o "required": ["name"]
+                 * diz ao Swagger UI para marcar os campos exigidos
+                 * e recusar o envio sem eles.
+                 */
                 ArtistInput: {
                     type: "object",
                     required: ["name"],
@@ -49,6 +114,11 @@ const options: Options = {
                         imageUrl: { type: "string" },
                     },
                 },
+
+                /*
+                 * SCHEMA ALBUM (resposta)
+                 * Inclui artistId para mostrar a FK ao artista.
+                 */
                 Album: {
                     type: "object",
                     properties: {
@@ -65,6 +135,13 @@ const options: Options = {
                         updatedAt: { type: "string", format: "date-time" },
                     },
                 },
+
+                /*
+                 * SCHEMA ALBUMINPUT (requisição)
+                 * Obrigatórios: title e artistId.
+                 * (O artista precisa existir; o controller valida isso
+                 * e devolve 404 se o ID informado não existir.)
+                 */
                 AlbumInput: {
                     type: "object",
                     required: ["title", "artistId"],
@@ -79,6 +156,11 @@ const options: Options = {
                         artistId: { type: "integer", example: 1 },
                     },
                 },
+
+                /*
+                 * SCHEMA SONG (resposta)
+                 * Inclui albumId e artistId para mostrar as duas FKs.
+                 */
                 Song: {
                     type: "object",
                     properties: {
@@ -92,6 +174,15 @@ const options: Options = {
                         updatedAt: { type: "string", format: "date-time" },
                     },
                 },
+
+                /*
+                 * SCHEMA SONGINPUT (requisição)
+                 * Obrigatórios: title e albumId.
+                 * O "artistId" tem description explicando a regra
+                 * especial: se omitido, herda do álbum. Isso aparece
+                 * como tooltip no Swagger UI, alertando o professor
+                 * e os demais integrantes.
+                 */
                 SongInput: {
                     type: "object",
                     required: ["title", "albumId"],
@@ -108,6 +199,12 @@ const options: Options = {
                         },
                     },
                 },
+
+                /*
+                 * SCHEMA ERROR (resposta de erro)
+                 * Reutilizado em todos os 400/404/500.
+                 * Mantém o formato { error: "mensagem" } uniforme.
+                 */
                 Error: {
                     type: "object",
                     properties: {
@@ -117,6 +214,13 @@ const options: Options = {
                         },
                     },
                 },
+
+                /*
+                 * SCHEMA PAGINATIONMETA (bloco "meta" das listagens)
+                 * Devolvido em todas as respostas paginadas para que
+                 * o frontend calcule a paginação (quantas páginas
+                 * existem, onde estamos, etc.).
+                 */
                 PaginationMeta: {
                     type: "object",
                     properties: {
@@ -128,8 +232,32 @@ const options: Options = {
                 },
             },
         },
+
+        /*
+         * ─────────────────────────────────────────────────────
+         * PATHS: todos os endpoints documentados
+         * ─────────────────────────────────────────────────────
+         * Cada chave é um caminho RELATIVO ao server.
+         * Ex: "/artists" com server "http://localhost:3000/api"
+         *     vira "http://localhost:3000/api/artists".
+         *
+         * Dentro de cada rota, GET/POST/PUT/DELETE são declarados
+         * como propriedades do objeto. Cada um tem:
+         * - tags:  grupo no Swagger UI
+         * - summary: título curto do card
+         * - parameters: parâmetros (query, path)
+         * - requestBody: corpo aceito no POST/PUT
+         * - responses: códigos HTTP e o que devolvem
+         * ─────────────────────────────────────────────────────
+         */
         paths: {
             /* ---------------- ARTISTS ---------------- */
+
+            /*
+             * /artists
+             * - GET: lista paginada com filtro opcional de gênero
+             * - POST: cria um novo artista
+             */
             "/artists": {
                 get: {
                     tags: ["Artists"],
@@ -147,10 +275,12 @@ const options: Options = {
                                     schema: {
                                         type: "object",
                                         properties: {
+                                            // data é um array de Artist
                                             data: {
                                                 type: "array",
                                                 items: { $ref: "#/components/schemas/Artist" },
                                             },
+                                            // meta traz a paginação
                                             meta: { $ref: "#/components/schemas/PaginationMeta" },
                                         },
                                     },
@@ -162,6 +292,7 @@ const options: Options = {
                 post: {
                     tags: ["Artists"],
                     summary: "Cria um artista",
+                    // Corpo esperado: ArtistInput (name obrigatório)
                     requestBody: {
                         required: true,
                         content: {
@@ -172,6 +303,7 @@ const options: Options = {
                     },
                     responses: {
                         "201": { description: "Criado" },
+                        // 400 quando falta nome, URL inválida ou nome duplicado
                         "400": {
                             description: "Dados inválidos",
                             content: {
@@ -183,6 +315,12 @@ const options: Options = {
                     },
                 },
             },
+
+            /*
+             * /artists/{id}
+             * Operações sobre um artista específico.
+             * "{id}" é parâmetro de caminho (path param).
+             */
             "/artists/{id}": {
                 get: {
                     tags: ["Artists"],
@@ -201,6 +339,7 @@ const options: Options = {
                     parameters: [
                         { in: "path", name: "id", required: true, schema: { type: "integer" } },
                     ],
+                    // Reutiliza ArtistInput — o controller permite body parcial
                     requestBody: {
                         required: true,
                         content: {
@@ -221,12 +360,14 @@ const options: Options = {
                         { in: "path", name: "id", required: true, schema: { type: "integer" } },
                     ],
                     responses: {
-                        "204": { description: "Removido" },
+                        "204": { description: "Removido" },   // 204 = sem corpo
                         "404": { description: "Não encontrado" },
                     },
                 },
             },
+
             /* ---------------- ALBUMS ---------------- */
+
             "/albums": {
                 get: {
                     tags: ["Albums"],
@@ -252,10 +393,12 @@ const options: Options = {
                     },
                     responses: {
                         "201": { description: "Criado" },
+                        // 404: o artistId informado não existe no banco
                         "404": { description: "Artista não existe" },
                     },
                 },
             },
+
             "/albums/{id}": {
                 get: {
                     tags: ["Albums"],
@@ -293,7 +436,9 @@ const options: Options = {
                     responses: { "204": { description: "Removido" } },
                 },
             },
+
             /* ---------------- SONGS ---------------- */
+
             "/songs": {
                 get: {
                     tags: ["Songs"],
@@ -319,10 +464,12 @@ const options: Options = {
                     },
                     responses: {
                         "201": { description: "Criado" },
+                        // 404: albumId ou artistId informado não existe
                         "404": { description: "Álbum não existe" },
                     },
                 },
             },
+
             "/songs/{id}": {
                 get: {
                     tags: ["Songs"],
@@ -360,7 +507,18 @@ const options: Options = {
                     responses: { "204": { description: "Removido" } },
                 },
             },
+
             /* ---------------- SEARCH ---------------- */
+
+            /*
+             * /search
+             * Busca global. Roda as três consultas em paralelo e
+             * devolve os resultados agrupados:
+             *   data.artists / data.albums / data.songs
+             *
+             * O frontend usa essa estrutura para renderizar três
+             * containers distintos na página de busca.
+             */
             "/search": {
                 get: {
                     tags: ["Search"],
@@ -413,7 +571,19 @@ const options: Options = {
             },
         },
     },
+
+    /*
+     * "apis" vazio: todas as rotas estão declaradas inline acima.
+     * Se no futuro o time quiser usar anotações JSDoc (@openapi)
+     * nos controllers, basta trocar para algo como
+     * apis: ["./src/routes/*.ts"].
+     */
     apis: [], // tudo declarado inline; não depende de JSDoc nos arquivos
 };
 
+/*
+ * swaggerJsdoc() compila o objeto "options" no formato final
+ * aceito pelo Swagger UI. Este é o objeto exportado e usado
+ * em index.ts para montar a página /api-docs.
+ */
 export const swaggerSpec = swaggerJsdoc(options);
