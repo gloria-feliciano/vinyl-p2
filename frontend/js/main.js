@@ -1,3 +1,4 @@
+//controla elemntos da página principal, como modais, playlists e feed global
 function carregarDestaquesPublicos() {
     mostrarAvisoApi(document.getElementById('vitrine-publica'));
 }

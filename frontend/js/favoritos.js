@@ -1,3 +1,4 @@
+//função responsável por carregar os favoritos salvos no localStorage e exibir a quantidade de favoritos
 function carregarFavoritos() {
     const container = document.getElementById('lista-favoritos');
     if (!container) return;

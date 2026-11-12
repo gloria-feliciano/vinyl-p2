@@ -1,3 +1,4 @@
+//função de busca de músicas ou artistas
 function buscar() {
     const campo = document.getElementById('campo-busca');
     const resultados = document.getElementById('resultados');

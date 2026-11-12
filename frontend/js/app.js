@@ -1,26 +1,28 @@
+//arquivo que controla interações da aplicação
+//exibe aviso na área de musicas quando a API não está disponível
 function renderizarApp() {
     mostrarAvisoApi(document.getElementById('vitrine-musicas'));
 }
-
+//busca artistas cadastros e exibe na vitrine de explorar
 function carregarArtistasExplorar() {
     mostrarAvisoApi(document.getElementById('lista-artistas'));
 }
-
+//conjunto de opções do botão flutuante
 function toggleFab() {
     const opcoes = document.getElementById('fab-options');
     if (opcoes) opcoes.style.display = opcoes.style.display === 'flex' ? 'none' : 'flex';
 }
-
+//função responsável por alternar o estado de favorito de uma música no main
 function alternarFavoritoDoMain(id) {
     alternarFavoritoGlobal(id);
 }
-
+//monstrar área de sugestão de músicas para review
 function buscarSugestoesReview() {
     mostrarAvisoApi(document.getElementById('sugestoes-review'));
     const sugestoes = document.getElementById('sugestoes-review');
     if (sugestoes) sugestoes.style.display = 'block';
 }
-
+//função responsável por selecionar uma música da lista de sugestões para review
 function selecionarMusicaReview(titulo, artista) {
     const musica = document.getElementById('rev-musica');
     const nomeArtista = document.getElementById('rev-artista');
@@ -29,18 +31,18 @@ function selecionarMusicaReview(titulo, artista) {
     const sugestoes = document.getElementById('sugestoes-review');
     if (sugestoes) sugestoes.style.display = 'none';
 }
-
+//função responsável por selecionar a nota da música no review
 function selecionarEstrelas(nota) {
     notaSelecionada = nota;
     document.querySelectorAll('.star').forEach((estrela, indice) => {
         estrela.style.color = indice < nota ? '#e81856' : '#444';
     });
 }
-
+//função responsável por salvar o review da música
 function salvarReview() {
     alert(MENSAGEM_API_INDISPONIVEL);
 }
-
+//função responsável por preparar o modal de review com os dados da música
 function prepararModalReview(titulo = '', artista = '') {
     const musica = document.getElementById('rev-musica');
     const nomeArtista = document.getElementById('rev-artista');
@@ -49,7 +51,7 @@ function prepararModalReview(titulo = '', artista = '') {
     if (nomeArtista) nomeArtista.value = artista;
     if (modal) modal.style.display = 'flex';
 }
-
+//função responsável por fechar o modal de review e limpar os campos
 function fecharModal() {
     const modal = document.getElementById('modal-overlay');
     if (modal) modal.style.display = 'none';
@@ -58,7 +60,7 @@ function fecharModal() {
     const texto = document.getElementById('rev-texto');
     if (texto) texto.value = '';
 }
-
+//função responsável por preparar o modal de playlist com os dados da música
 function prepararModalPlaylist() {
     musicasSelecionadasParaPlaylist = [];
     const nome = document.getElementById('play-nome');
@@ -70,19 +72,19 @@ function prepararModalPlaylist() {
     if (lista) lista.textContent = 'Nenhuma música adicionada';
     if (modal) modal.style.display = 'flex';
 }
-
+//função responsável por buscar músicas para adicionar na playlist
 function buscarMusicasParaPlaylist() {
     const sugestoes = document.getElementById('sugestoes-playlist');
     mostrarAvisoApi(sugestoes);
     if (sugestoes) sugestoes.style.display = 'block';
 }
-
+//função responsável por adicionar uma música na lista de músicas selecionadas para a playlist
 function adicionarMusicaLista(titulo, artista, id) {
     if (musicasSelecionadasParaPlaylist.some(musica => musica.id === id)) return;
     musicasSelecionadasParaPlaylist.push({ id, titulo, artista });
     renderizarMusicasSelecionadas();
 }
-
+//função responsável por renderizar a lista de músicas selecionadas para a playlist
 function renderizarMusicasSelecionadas() {
     const container = document.getElementById('lista-musicas-selecionadas');
     if (!container) return;
